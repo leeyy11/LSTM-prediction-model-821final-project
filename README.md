@@ -25,5 +25,5 @@ We employ a Multilayer Perceptron (MLP) to predict the potential diseases a pati
 
 Model evaluation & Vitualization:
 
-We showing the perfomance of the model by graphs.
+We showing the perfomance of the model by AUC and AP graphs.
 
