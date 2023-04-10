@@ -15,7 +15,7 @@ Qin Weng; Yaoyao Li; Xi Liang.
 ## Development steps
 Data Prepocessing(Classification & Code2vec):
 
-We are aware that the ICD codes can be subdivided into numerous overarching categories corresponding to various disease types, owing to the extensive range of ICD codes available. In the data preprocessing phase, we allocate patients into the pre-existing disease categories based on their respective ICD codes. Utilizing the patients' ICD codes, we construct a binary matrix with patient IDs on the horizontal axis and major disease categories on the vertical axis, which effectively represents the patients' morbidity information.
+We are awaring that the ICD codes can be subdivided into numerous overarching categories corresponding to various disease types, owing to the extensive range of ICD codes available. In the data preprocessing phase, we allocate patients into the pre-existing disease categories based on their respective ICD codes. Utilizing the patients' ICD codes, we construct a binary matrix with patient IDs on the horizontal axis and major disease categories on the vertical axis, which effectively represents the patients' morbidity information.
 
 
 Feature extraction:
@@ -28,5 +28,5 @@ We employ a Multilayer Perceptron (MLP) to predict the potential diseases a pati
 
 Model evaluation & Vitualization:
 
-We showing the perfomance of the model by AUC and AP graphs.
+We show the perfomance of the model by AUC and AP graphs.
 
