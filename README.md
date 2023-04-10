@@ -1,13 +1,13 @@
 # MLP-for-disease-prediction-821final-project
 Group member: Qin Weng; Yaoyao Li; Xi Liang. 
 
-Data Prepocessing: Classify ICD-10 code based on existing category. Convert classified ICD-10 vector into a binary vector of description on these codes.
+*Data Prepocessing*: Classify ICD-10 code based on existing category. Convert classified ICD-10 vector into a binary vector of description on these codes.
 
-Feature extraction: Reduce the dimension of the sparse matrix to extract useful information.
+*Feature extraction*: Reduce the dimension of the sparse matrix to extract useful information.
 
-Model prediction: Input data to train the model and find the optimized parameters. Also showing the perfomance of the model by graphs.
+*Model prediction*: Input data to train the model and find the optimized parameters. Also showing the perfomance of the model by graphs.
 
-
+*Model evaluation & Vitualization*
 
 Data Prepocessing(Classification & Code2vec):
 
@@ -23,7 +23,7 @@ Model prediction:
 
 We employ a Multilayer Perceptron (MLP) to predict the potential diseases a patient may develop. The Multilayer Perceptron (MLP) is a type of artificial neural network (ANN) that can be employed for predicting potential diseases a patient may develop. The MLP consists of an input layer, one or more hidden layers, and an output layer. We input data to train the model and find the optimized parameters. 
 
-Model evaluation:
+Model evaluation & Vitualization:
 
 We showing the perfomance of the model by graphs.
 
