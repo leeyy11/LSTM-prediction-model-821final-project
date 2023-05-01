@@ -1,8 +1,12 @@
+"""Clinical data with ICD code preprocessing."""
 import pandas as pd
 
 
 class DataProcessor:
+    """Define a dataprocessor."""
+
     def __init__(self, diag_filename="DXCCSR.csv"):
+        """Define the ICD reference file."""
         self.reference = pd.read_csv(diag_filename)
         self.reference = self.reference[
             [
@@ -29,7 +33,8 @@ class DataProcessor:
             ],
         )
 
-    def expand_diag(self, diag):
+    def expand_diag(self, diag: pd.DataFrame) -> pd.DataFrame:
+        """Catergorize and expand the diagnoses data."""
         # merge diagnoses data with ICD code reference
         diag = diag[diag["icd_version"] == 10][["subject_id", "icd_code"]]
         diag = diag.merge(
@@ -45,7 +50,10 @@ class DataProcessor:
 
         return diag
 
-    def data_load(self, patient_filename, diagnoses_filename):
+    def data_load(
+        self, patient_filename: str, diagnoses_filename: str
+    ) -> pd.DataFrame:
+        """Load and parsing clinical data."""
         # Load patient and diagnoses data
         pat = pd.read_csv(patient_filename)
         diag = pd.read_csv(diagnoses_filename)
