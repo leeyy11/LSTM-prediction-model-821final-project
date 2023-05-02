@@ -75,21 +75,26 @@ pip install numpy pandas sklearn torch matplotlib seaborn
 
 ### DataProcessor Class
 
-The `DataProcessor` class provides methods to categorize, expand, load and parse diagnoses data. 
+The `DataProcessor` class is designed to process and categorize diagnoses data using ICD-10-CM codes for further analysis. The class provides three methods: `__init__`, `diag_categorize`, `diag_pca`, and `data_load`.
 
-To use this class, create an instance of the class with the `diag_filename` parameter (default value is "DXCCSR.csv"). Then, you can call the following methods:
+#### __init__ Method
 
-#### diag_categorize(diag_data: pd.DataFrame) -> pd.DataFrame
+The `__init__` method initializes the class and reads in the ICD reference file. It then selects the necessary columns and replaces the single quotes in column names with an empty string. It then converts the data from a wide format to a long format using `pd.melt` and drops the 'variable' column. The result is stored in the `self.reference` attribute.
 
-Categorize and expand the diagnoses data. This method takes a Pandas DataFrame as input and returns a Pandas DataFrame as output.
+#### diag_categorize Method
 
-#### pca_extract(n_components: int, data: pd.DataFrame) -> pd.DataFrame
+The `diag_categorize` method categorizes diagnoses data by merging the diagnoses data with the ICD code reference. It then pivots the data and fills any missing values with 0. The result is returned as a pandas DataFrame.
 
-Perform PCA on data to extract to n_components features. This method takes an interger as the number of features, and a Pandas DataFrame as data input. This method returns a Pandas DataFrame as output.
+#### diag_pca Method
 
-#### data_load(n_components: int, patient_filename: str, diagnoses_filename: str) -> pd.DataFrame
+The `diag_pca` method performs PCA on the data using the `PCAClassifier` class from the `PCA` module. It then returns the transformed data as a pandas DataFrame.
 
-Load and parsing clinical data. This method takes three parameters, an interger as the number of features for PCA, `patient_filename` and `diagnoses_filename`, which are the names of the patient and diagnoses files to be loaded, respectively. It returns a Pandas DataFrame as output.
+#### data_load Method
+
+The `data_load` method reads in a CSV file of diagnoses data and calls the `diag_categorize` and `diag_pca` methods to process the data. It then returns the transformed data and the diagnoses data for the specified disease as pandas DataFrames.
+
+Note that the `diag_data` argument passed to the `diag_categorize` method must have an 'icd_version' column with the value '10' for the method to work properly.
+
 
 #### Example
 
@@ -98,13 +103,14 @@ from data_processor import DataProcessor
 import pandas as pd
 
 processor = DataProcessor()
-patient_file = "patient_data.csv"
+disease_name = "Intestinal infection"
 diagnoses_file = "diagnoses_data.csv"
+n_component = 10
 
-data = processor.data_load(patient_file, diagnoses_file)
+data = processor.data_load(disease_name, diagnoses_file, n_component)
 ```
 
-In the example above, an instance of the `DataProcessor` class is created, and the `data_load` method is used to load and parse clinical data from two input files: `patient_data.csv` and `diagnoses_data.csv`. The resulting output is stored in the `data` variable.
+In the example above, an instance of the `DataProcessor` class is created, and the `data_load` method is used to load and parse clinical data from input `diagnoses_data.csv`, and the specific disease name with the dimension the user wants. The resulting output is stored in the `data` variable.
 
 ### DiseasePred Class
 
