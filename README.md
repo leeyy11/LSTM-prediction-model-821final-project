@@ -1,4 +1,9 @@
 # MLP-for-disease-prediction-821final-project
+
+## Group member
+
+Qin Weng; Yaoyao Li; Xi Liang.
+
 # BioMLP Library
 
 This library implements a Multilayer Perceptron (MLP) model for disease prediction using patient ICD-10 codes. The library consists of four main modules: data preprocessing, feature extraction, model prediction, and model evaluation/visualization.
@@ -37,6 +42,7 @@ This library requires the following Python packages:
 - sklearn
 - torch
 - matplotlib
+- seaborn
 
 ## Installation
 
@@ -52,7 +58,9 @@ pip install pandas
 pip install sklearn
 pip install torch
 pip install matplotlib
+pip install seaborn
 ```
 
-## Group member
-Qin Weng; Yaoyao Li; Xi Liang. 
+## API Reference
+
+ 
