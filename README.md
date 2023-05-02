@@ -1,32 +1,50 @@
 # MLP-for-disease-prediction-821final-project
+# BioMLP Library
+
+This library implements a Multilayer Perceptron (MLP) model for disease prediction using patient ICD-10 codes. The library consists of four main modules: data preprocessing, feature extraction, model prediction, and model evaluation/visualization.
+
+## Data Preprocessing
+
+In the data preprocessing phase, patients are allocated into pre-existing disease categories based on their respective ICD-10 codes. A binary matrix is constructed with patient IDs on the horizontal axis and major disease categories on the vertical axis, effectively representing the patients' morbidity information.
+
+## Feature Extraction
+
+The feature matrix derived from the ICD codes represents a highly sparse structure with patient IDs on the horizontal axis and overarching disease categories on the vertical axis. To address the inherent sparsity of the matrix and mitigate noise, dimensionality reduction techniques are employed to enhance the discernment of meaningful patterns within the dataset.
+
+## Model Prediction
+
+A Multilayer Perceptron (MLP) model is employed to predict potential diseases a patient may develop. The MLP consists of an input layer, one or more hidden layers, and an output layer. Data is input to train the model and find the optimized parameters.
+
+## Model Evaluation & Visualization
+
+The performance of the MLP model is evaluated using AUC and AP graphs, which are generated to visualize the model's accuracy.
+
+## Usage
+
+To use this library, import the required modules and call the corresponding functions:
+
+- `preprocess_data`: classifies ICD-10 codes based on existing categories and converts them into a binary vector.
+- `extract_features`: reduces the dimensionality of the sparse matrix to extract useful information.
+- `train_model`: inputs data to train the MLP model and learn the optimized parameters.
+- `evaluate_model`: shows the performance of the model using AUC and AP graphs.
+
+## Dependencies
+
+This library requires the following Python packages:
+
+- numpy
+- pandas
+- sklearn
+- torch
+- matplotlib
+
+## Installation
+
+To install this library, run the following command:
+
+```
+pip install biomlp
+```
+
 ## Group member
 Qin Weng; Yaoyao Li; Xi Liang. 
-
-## Logistics
-1. *Data Prepocessing*: Classify ICD-10 code based on existing category and convert into a binary vector.
-
-2. *Feature extraction*: Reduce the dimension of the sparse matrix to extract useful information.
-
-3. *Model prediction*: Input data to train the model. Learn the optimized parameters.
-
-5. *Model evaluation & Vitualization*: Show the perfomance of the model.
-
-
-## Development steps
-Data Prepocessing(Classification & Code2vec):
-
-We are awaring that the ICD codes can be subdivided into numerous overarching categories corresponding to various disease types, owing to the extensive range of ICD codes available. In the data preprocessing phase, we allocate patients into the pre-existing disease categories based on their respective ICD codes. Utilizing the patients' ICD codes, we construct a binary matrix with patient IDs on the horizontal axis and major disease categories on the vertical axis, which effectively represents the patients' morbidity information.
-
-
-Feature extraction:
-
-The feature matrix in our study, derived from the ICD codes, represents a highly sparse structure with patient IDs on the horizontal axis and overarching disease categories on the vertical axis. Due to the inherent sparsity of the matrix, it is susceptible to the presence of excessive noise, which could hinder the extraction of valuable information. To address this challenge, we employ dimensionality reduction techniques on the data to mitigate the noise and enhance the discernment of meaningful patterns within the dataset.
-
-Model prediction:
-
-We employ a Multilayer Perceptron (MLP) to predict the potential diseases a patient may develop. The Multilayer Perceptron (MLP) is a type of artificial neural network (ANN) that can be employed for predicting potential diseases a patient may develop. The MLP consists of an input layer, one or more hidden layers, and an output layer. We input data to train the model and find the optimized parameters. 
-
-Model evaluation & Vitualization:
-
-We show the perfomance of the model by AUC and AP graphs.
-
