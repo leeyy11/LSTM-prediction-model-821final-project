@@ -39,7 +39,7 @@ class DataProcessor:
     def diag_catergorize(self, diag_data: pd.DataFrame) -> pd.DataFrame:
         """Catergorize and expand the diagnoses data."""
         # merge diagnoses data with ICD code reference
-        diag = diag_data[diag_data["icd_version"] == 10][["subject_id", "icd_code"]]
+        diag = diag_data[diag_data["icd_version"] == "10"][["subject_id", "icd_code"]]
         diag = diag.merge(
             self.reference, left_on="icd_code", right_on="'ICD-10-CM CODE'"
         )
