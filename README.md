@@ -45,8 +45,8 @@ To use this library, import the required modules and call the corresponding func
     ]
     ```
 
-- `DataProcessor`: reduces the dimensionality of the sparse matrix to extract useful information.
-- `DiseasePred`: classifies ICD-10 codes based on existing categories and converts them into a binary vector and by inputing data to train the MLP model and learn the optimized parameters, it also shows the performance of the model using AUC and AP graphs.
+- `DataProcessor`: classifies ICD-10 codes based on existing categories and reduces the dimensionality of the sparse matrix to extract useful information.
+- `DiseasePred`:  Converts processed data into a binary vector and by inputing data to train the MLP model and learn the optimized parameters, it also shows the performance of the model using AUC and AP graphs.
 
 ## Dependencies
 
@@ -79,13 +79,17 @@ The `DataProcessor` class provides methods to categorize, expand, load and parse
 
 To use this class, create an instance of the class with the `diag_filename` parameter (default value is "DXCCSR.csv"). Then, you can call the following methods:
 
-#### expand_diag(diag: pd.DataFrame) -> pd.DataFrame
+#### diag_categorize(diag_data: pd.DataFrame) -> pd.DataFrame
 
 Categorize and expand the diagnoses data. This method takes a Pandas DataFrame as input and returns a Pandas DataFrame as output.
 
-#### data_load(patient_filename: str, diagnoses_filename: str) -> pd.DataFrame
+#### pca_extract(n_components: int, data: pd.DataFrame) -> pd.DataFrame
 
-Load and parsing clinical data. This method takes two parameters, `patient_filename` and `diagnoses_filename`, which are the names of the patient and diagnoses files to be loaded, respectively. It returns a Pandas DataFrame as output.
+Perform PCA on data to extract to n_components features. This method takes an interger as the number of features, and a Pandas DataFrame as data input. This method returns a Pandas DataFrame as output.
+
+#### data_load(n_components: int, patient_filename: str, diagnoses_filename: str) -> pd.DataFrame
+
+Load and parsing clinical data. This method takes three parameters, an interger as the number of features for PCA, `patient_filename` and `diagnoses_filename`, which are the names of the patient and diagnoses files to be loaded, respectively. It returns a Pandas DataFrame as output.
 
 #### Example
 
