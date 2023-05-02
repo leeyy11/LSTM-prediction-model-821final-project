@@ -60,3 +60,10 @@ class DataProcessor:
         data = pd.DataFrame(data=diag_features, index=cat_diag.index)
 
         return data
+
+    def load_data(self, data_filename: str) -> pd.DataFrame([[int]]):
+        """Read in csv file of diagnoses data and reformat to dataframe."""
+        diag_data = pd.read_csv(data_filename)
+        data_final = self.diag_catergorize(diag_data)
+
+        return data_final
