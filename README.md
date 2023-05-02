@@ -77,19 +77,19 @@ pip install numpy pandas sklearn torch matplotlib seaborn
 
 The `DataProcessor` class is designed to process and categorize diagnoses data using ICD-10-CM codes for further analysis. The class provides three methods: `__init__`, `diag_categorize`, `diag_pca`, and `data_load`.
 
-#### __init__ Method
+- __init__ Method
 
 The `__init__` method initializes the class and reads in the ICD reference file. It then selects the necessary columns and replaces the single quotes in column names with an empty string. It then converts the data from a wide format to a long format using `pd.melt` and drops the 'variable' column. The result is stored in the `self.reference` attribute.
 
-#### diag_categorize Method
+- diag_categorize Method
 
 The `diag_categorize` method categorizes diagnoses data by merging the diagnoses data with the ICD code reference. It then pivots the data and fills any missing values with 0. The result is returned as a pandas DataFrame.
 
-#### diag_pca Method
+- diag_pca Method
 
 The `diag_pca` method performs PCA on the data using the `PCAClassifier` class from the `PCA` module. It then returns the transformed data as a pandas DataFrame.
 
-#### data_load Method
+- data_load Method
 
 The `data_load` method reads in a CSV file of diagnoses data and calls the `diag_categorize` and `diag_pca` methods to process the data. It then returns the transformed data and the diagnoses data for the specified disease as pandas DataFrames.
 
@@ -114,24 +114,39 @@ In the example above, an instance of the `DataProcessor` class is created, and t
 
 ### DiseasePred Class
 
-The `DiseasePred` class initializes the model. The `run` function trains the model and returns the trained model. You can specify the following hyperparameters as arguments to the `DiseasePred` class:
+The `DiseasePred` class is designed for disease prediction using a multilayer perceptron (MLP) model. The MLP model is implemented using PyTorch, and performance is evaluated using the ROC AUC score and average precision score. It contains the following methods:
 
-* `hidden_size`: The number of units in the hidden layer (default=10).
-* `num_layers`: The number of layers in the model (default=1).
+- `__init__(self, disease_name:str, diagnoses_filename: str, n_components=10)`:
+    Initializes a `DiseasePred` object. It loads the data and creates an MLP model for the specified disease. The data is loaded using `DataProcessor().data_load()` method from `data_processing` module. `disease_name` is a string specifying the disease to be predicted, `diagnoses_filename` is the file path of diagnoses file, and `n_components` is an integer specifying the number of principal components to be used for dimensionality reduction.
 
-You can also specify the following hyperparameters as arguments to the `run` function:
+- `learning(self, lam=0e-5, learning_rate=0.001, epochs=50)`:
+    Trains the MLP model using the loaded data. `lam`, `learning_rate`, and `epochs` are optional parameters. `lam` specifies the L1 regularization penalty weight. `learning_rate` specifies the learning rate for the optimizer, and `epochs` specifies the number of training epochs.
 
-* `learning_rate`: The learning rate for the optimizer (default=0.001).
-* `epochs`: The number of epochs to train the model (default=50).
-* `batch_size`: The batch size for the data loader (default=7).
-* `lam`: The regularization parameter for L1 regularization (default=0e-5).
+- `pred(self, data_x: np.ndarray)`:
+    Predicts the probability of the disease based on the provided data. `data_x` is a numpy array containing the patient data for prediction. The user could also call this function under the class to make prediction on the data they want to use.
 
-The trained model returns the predicted probabilities for the test set. The `performance` function plots the ROC curve and the Precision-Recall curve, and returns the Area Under the Curve (AUC) for the ROC curve and the average precision (AP) for the Precision-Recall curve. You can use it as follows:
+- `performance(self, new_diag: np.ndarray, new_disease: np.ndarray)`:
+    Evaluates the performance of the MLP model on new data. `new_diag` is a numpy array containing the patient data for prediction, and `new_disease` is a numpy array containing the corresponding disease labels.
+
+#### Example
+
+Here is an example of using the `DiseasePred` class:
 
 ```python
-from disease_prediction import performance
+from DiseasePred import DiseasePred
 
-performance(labels, pred)
+# Initialize the DiseasePred object for predicting disease 'diabetes'
+dp = DiseasePred('Intestinal infection', 'diagnoses.csv', n_components=10)
+
+# Train the model
+dp.learning(lam=0.001, learning_rate=0.01, epochs=50)
+
+# Predict the disease probability for a new patient
+new_data = np.random.rand(1, 10)
+pred_prob = dp.pred(new_data)
+
+# Evaluate the model performance on new data
+new_diag = np.random.rand(100, 10)
+new_disease = np.random.randint(2, size=100)
+dp.performance(new_diag, new_disease)
 ```
-
-where `labels` are the true labels of the test set, and `pred` are the predicted probabilities for the test set.
