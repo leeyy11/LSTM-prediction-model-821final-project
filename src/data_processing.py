@@ -1,5 +1,7 @@
 """Clinical data with ICD code preprocessing."""
 import pandas as pd
+from PCA import PCAClassifier
+import numpy as np
 
 
 class DataProcessor:
@@ -33,22 +35,24 @@ class DataProcessor:
             ],
         )
 
-    def expand_diag(self, diag: pd.DataFrame) -> pd.DataFrame:
+
+    def diag_catergorize(self, diag_data: pd.DataFrame) -> pd.DataFrame:
         """Catergorize and expand the diagnoses data."""
         # merge diagnoses data with ICD code reference
-        diag = diag[diag["icd_version"] == 10][["subject_id", "icd_code"]]
+        diag = diag_data[diag_data["icd_version"] == 10][["subject_id", "icd_code"]]
         diag = diag.merge(
             self.reference, left_on="icd_code", right_on="'ICD-10-CM CODE'"
         )
 
-        # Pivot the diagnoses data
+        # pivot the catergorized diagnoses data
         diag["count"] = 1
         diag = diag[["subject_id", "value", "count"]]
-        diag = diag.pivot_table(
-            index="subject_id", columns="value", values="count", fill_value=0
+        cat_diag = diag.pivot_table(
+            index="subject_id", columns = "value", values="count", fill_value=0
         )
 
-        return diag
+        return cat_diag
+
 
     def data_load(
         self, patient_filename: str, diagnoses_filename: str
@@ -58,8 +62,12 @@ class DataProcessor:
         pat = pd.read_csv(patient_filename)
         diag = pd.read_csv(diagnoses_filename)
 
-        # Merge patient data and expanded diagnoses data
-        diag = self.expand_diag(diag)
+        # perform PCA on catergrized diagnoses data, and merged with patient data
+        cat_diag = self.diag_catergorize(diag)
+        pca = PCAClassifier(n_components=10)
+        diag_features = pca.fit_transform(cat_diag.values)
+        diag = pd.DataFrame(data=diag_features, index=cat_diag.index)
+
         data = pat.merge(diag, on="subject_id", how="right")
 
         return data
