@@ -28,10 +28,25 @@ The performance of the MLP model is evaluated using AUC and AP graphs, which are
 
 To use this library, import the required modules and call the corresponding functions:
 
-- `preprocess_data`: classifies ICD-10 codes based on existing categories and converts them into a binary vector.
-- `extract_features`: reduces the dimensionality of the sparse matrix to extract useful information.
-- `train_model`: inputs data to train the MLP model and learn the optimized parameters.
-- `evaluate_model`: shows the performance of the model using AUC and AP graphs.
+- Check the input data file follows the formats below:
+  
+  * The data file is of ".csv" format
+  
+  * The data file should contain the first three columns as "subject_id", "icd_version" and "icd_code". The data type of each one should be string.
+  
+  The example data file is shown below:
+  
+  ```python
+
+  diagnoses = [
+        ["subject_id", "icd_version", "icd_code"],
+        ["001", "10", "A000"],
+        ["001", "10", "A001"],
+    ]
+    ```
+
+- `DataProcessor`: reduces the dimensionality of the sparse matrix to extract useful information.
+- `DiseasePred`: classifies ICD-10 codes based on existing categories and converts them into a binary vector and by inputing data to train the MLP model and learn the optimized parameters, it also shows the performance of the model using AUC and AP graphs.
 
 ## Dependencies
 
@@ -50,7 +65,7 @@ To install this library, follow these steps:
 
 1. Clone the repository to your local machine
 
-1. Install the required dependencies by running the following command:
+2. Install the required dependencies by running the following command:
 
 ```
 pip install numpy pandas sklearn torch matplotlib seaborn
