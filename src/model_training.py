@@ -188,9 +188,6 @@ def single_modeling(xx, yy):
             labels += y.tolist()
     pred = sum(pred, [])
 
-    # performance(np.array([labels[i] for i in range(len(labels))]),
-    #                     np.array([pred[i] for i in range(len(pred))]))
-
     labels1 = np.array(labels)
     pred1 = np.array(pred)
     auc, ap = performance(labels1, pred1)
