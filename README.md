@@ -101,7 +101,6 @@ You can also specify the following hyperparameters as arguments to the `run` fun
 * `batch_size`: The batch size for the data loader (default=7).
 * `lam`: The regularization parameter for L1 regularization (default=0e-5).
 
-## Output
 The trained model returns the predicted probabilities for the test set. The `performance` function plots the ROC curve and the Precision-Recall curve, and returns the Area Under the Curve (AUC) for the ROC curve and the average precision (AP) for the Precision-Recall curve. You can use it as follows:
 
 ```python
