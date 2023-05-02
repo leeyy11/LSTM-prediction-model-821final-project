@@ -1,3 +1,4 @@
+"""Tools for disease prediction."""
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
@@ -20,6 +21,7 @@ class MLP(nn.Module):
     def __init__(
         self, input_size: int, hidden_size: int = 10, num_layers: int = 1
     ) -> torch.Tensor:
+        """Define the structure and parameters of MLP model."""
         super(MLP, self).__init__()
         self.flatten = nn.Flatten()
         layers = []
@@ -33,13 +35,14 @@ class MLP(nn.Module):
         self.linear_sigmoid_stack = nn.Sequential(*layers)
 
     def forward(self, x: torch.Tensor):
+        """Define the forward function in MLP."""
         x = self.flatten(x).to(torch.float32)
         logits = self.linear_sigmoid_stack(x)
         return logits
 
 
 class DiseasePred:
-    """Define a disease prediction library"""
+    """Define a disease prediction library."""
 
     def __init__(
         self, disease_name: str, diagnoses_filename: str, n_components: int = 10
