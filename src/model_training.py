@@ -99,9 +99,9 @@ class DiseasePred():
         pred = self.model(x_tensor).detach().numpy()
         return(pred)
     
-    def performance(self, new_diag: np.ndarray, new_dissease: np.ndarray):
+    def performance(self, new_diag: np.ndarray, new_disease: np.ndarray):
         """Evaluating and plotting the model performance on new data."""
-        labels = new_dissease
+        labels = new_disease
         pred = self.pred(new_diag)
         auc = roc_auc_score(labels, pred)
         ap = average_precision_score(labels, pred)
@@ -131,8 +131,4 @@ class DiseasePred():
 
         plt.show()
         return auc, ap
-    
-        
-
-
     
