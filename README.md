@@ -53,12 +53,7 @@ To install this library, follow these steps:
 1. Install the required dependencies by running the following command:
 
 ```
-pip install numpy
-pip install pandas
-pip install sklearn
-pip install torch
-pip install matplotlib
-pip install seaborn
+pip install numpy pandas sklearn torch matplotlib seaborn
 ```
 
 ## API Reference
@@ -93,3 +88,26 @@ data = processor.data_load(patient_file, diagnoses_file)
 In the example above, an instance of the `DataProcessor` class is created, and the `data_load` method is used to load and parse clinical data from two input files: `patient_data.csv` and `diagnoses_data.csv`. The resulting output is stored in the `data` variable.
 
 ### DiseasePred Class
+
+The `DiseasePred` class initializes the model. The `run` function trains the model and returns the trained model. You can specify the following hyperparameters as arguments to the `DiseasePred` class:
+
+* `hidden_size`: The number of units in the hidden layer (default=10).
+* `num_layers`: The number of layers in the model (default=1).
+
+You can also specify the following hyperparameters as arguments to the `run` function:
+
+* `learning_rate`: The learning rate for the optimizer (default=0.001).
+* `epochs`: The number of epochs to train the model (default=50).
+* `batch_size`: The batch size for the data loader (default=7).
+* `lam`: The regularization parameter for L1 regularization (default=0e-5).
+
+## Output
+The trained model returns the predicted probabilities for the test set. The `performance` function plots the ROC curve and the Precision-Recall curve, and returns the Area Under the Curve (AUC) for the ROC curve and the average precision (AP) for the Precision-Recall curve. You can use it as follows:
+
+```python
+from disease_prediction import performance
+
+performance(labels, pred)
+```
+
+where `labels` are the true labels of the test set, and `pred` are the predicted probabilities for the test set.
