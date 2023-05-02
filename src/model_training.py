@@ -159,4 +159,6 @@ class DiseasePred:
         ax[1].legend(loc="upper right", fontsize=14)
 
         plt.show()
+        fig.figure.savefig("performance.png")
+        
         return auc, ap
