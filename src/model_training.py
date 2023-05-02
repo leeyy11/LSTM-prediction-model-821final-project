@@ -1,3 +1,5 @@
+# %% ---------------set hyper parameters and libraries--------------
+
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
@@ -5,37 +7,17 @@ import torch
 from torch.utils.data import DataLoader
 import torch.nn as nn
 from sklearn.metrics import roc_auc_score,average_precision_score,roc_curve,precision_recall_curve
-from feature_extraction import get_feature
 import seaborn as sns
-
-# data generation
-N_PATIENTS = 50000
-N_FEATURES = 100
-RANDOM_SEED = 2023
-STEP_SIZE = 1e-3
-
-# modeling
-training_ratio = 0.8
-test_ratio = 0.1
-
-learning_rate = 0.001
-batch_size = 7
-
-input_size=10
-num_layers = 1
-hidden_size = 10
-epochs = 50
-
-lam = 0e-5
+from data_processing import DataProcessor
 
 
-def split_set(test_ratio, data):
+def split_set(test_ratio=0.1, data: np.ndarray):
     train = data[:int(test_ratio*len(data))]
     test = data[int(test_ratio*len(data)):]
     return train, test
 
-# %% def data loader
-def load_data(data_x, data_y):
+# def data loader
+def load_data(data_x: np.ndarray, data_y: np.ndarray):
     class TransData_s():
         def __init__(self, xx, yy):
             self.X = xx
@@ -47,32 +29,32 @@ def load_data(data_x, data_y):
         def __getitem__(self, idx):
             return self.X[idx, :], np.array(self.y[idx])
 
-    x_train, x_test = split_set(test_ratio, data_x)
-    y_train, y_test = split_set(test_ratio, data_y)
+    x_train, x_test = split_set(test_ratio=0.1, data_x: np.ndarray)
+    y_train, y_test = split_set(test_ratio=0.1, data_y: np.ndarray)
 
     train_set = TransData_s(xx=x_train, yy=y_train)
     test_set = TransData_s(xx=x_test, yy=y_test)
 
-    train = DataLoader(train_set, batch_size=batch_size, shuffle=True)  # type: ignore
-    test = DataLoader(test_set, batch_size=batch_size, shuffle=True)  # type: ignore
+    train = DataLoader(train_set, batch_size=7, shuffle=True)  # type: ignore
+    test = DataLoader(test_set, batch_size=7, shuffle=True)  # type: ignore
 
     return train, test
 
 
-# %% def single label model
+# def single label model
 class DiseasePred(nn.Module):
-    def __init__(self, hidden_size, num_layers):
+    def __init__(self, hidden_size=10, num_layers=1):
         super(DiseasePred, self).__init__()
         self.flatten = nn.Flatten()
         layers = []
 
         # input_tensor = input_tensor.to(linear_layer.weight.dtype)
-        layers.append(nn.Linear(input_size,hidden_size))
+        layers.append(nn.Linear(input_size=10,hidden_size=10))
         layers.append(nn.ReLU())
         for i in range(num_layers - 1):
             layers.append(nn.Linear(hidden_size, hidden_size))
             layers.append(nn.ReLU())
-        layers.append(nn.Linear(hidden_size, 1))
+        layers.append(nn.Linear(hidden_size=10, 1))
         layers.append(nn.Sigmoid())
         self.linear_sigmoid_stack = nn.Sequential(*layers)
 
@@ -81,18 +63,14 @@ class DiseasePred(nn.Module):
         logits = self.linear_sigmoid_stack(x)
         return logits
 
-    # %% def model training
+# def model training
 
-
-def model_train(train,model, lam, learning_rate, epochs):
+def model_train(train: np.ndarray, model: DiseasePred, lam=0e-5, learning_rate=0.001, epochs=50):
     optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate)
 
-    train_loss_list = []
-    test_loss_list = []
     for t in range(epochs):
         print(f"Epoch {t + 1}\n-------------------------------")
 
-        train_loss = 0
         for X, y in train:
             predict = model(X)
             batch_loss = nn.functional.binary_cross_entropy(predict, y.unsqueeze(1).float())
@@ -107,11 +85,11 @@ def model_train(train,model, lam, learning_rate, epochs):
             batch_loss.backward()
             optimizer.step()
 
-    return model  # , train_loss_list, valid_loss_list
+    return model
 
 
-# %% def performance plot
-def performance(labels, pred):
+# def performance plot
+def performance(labels: int, pred: int):
     auc = roc_auc_score(labels, pred)
     ap = average_precision_score(labels, pred)
 
@@ -140,11 +118,13 @@ def performance(labels, pred):
     ax[1].legend(loc='upper right', fontsize=14)
 
     plt.show()
+    return auc, ap
 
 
-# # %% def single modeling
-def run():
-    X = get_feature()
+# def single modeling
+def run(patient_filename: str, diagnoses_filename: str):
+    # X = get_feature()
+    X=DataProcessor().data_load(patient_filename, diagnoses_filename)
     binary_output = np.random.randint(2, size=(len(X), 1))
     df_binary_output = pd.DataFrame(binary_output, columns=['Binary Output'], index=X.index)
     X = pd.concat([pd.DataFrame(X), df_binary_output], axis=1)
@@ -152,9 +132,9 @@ def run():
     yyy = np.array(X.iloc[:, -1])
     train,test = load_data(xxx, yyy)
 
-    model = DiseasePred(hidden_size, num_layers)
+    model = DiseasePred(hidden_size=10, num_layers=1)
 
-    model = model_train(train, model, lam, learning_rate, epochs)
+    model = model_train(train: np.ndarray, model: DiseasePred, lam=0e-5, learning_rate=0.001, epochs=50)
 
     labels = []
     pred = []
@@ -169,8 +149,3 @@ def run():
     auc, ap = performance(labels1, pred1)
 
     return auc,ap
-
-# %% ---------------single/multi simulation--------------
-if __name__=='__main__':
-
-    auc, ap=run()
