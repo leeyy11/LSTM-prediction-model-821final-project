@@ -35,7 +35,7 @@ class DataProcessor:
             ],
         )
 
-    def diag_catergorize(
+    def diag_categorize(
         self, n_component: int, diag_data: pd.DataFrame([[str]])
     ) -> pd.DataFrame([[int]]):
         """Catergorize and perform PCA diagnoses data."""
@@ -64,6 +64,6 @@ class DataProcessor:
     def load_data(self, data_filename: str) -> pd.DataFrame([[int]]):
         """Read in csv file of diagnoses data and reformat to dataframe."""
         diag_data = pd.read_csv(data_filename)
-        data_final = self.diag_catergorize(diag_data)
+        data_final = self.diag_categorize(diag_data)
 
         return data_final
