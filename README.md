@@ -126,7 +126,7 @@ The `DiseasePred` class is designed for disease prediction using a multilayer pe
     Predicts the probability of the disease based on the provided data. `data_x` is a numpy array containing the patient data for prediction. The user could also call this function under the class to make prediction on the data they want to use.
 
 - `performance(self, new_diag: np.ndarray, new_disease: np.ndarray)`:
-    Evaluates the performance of the MLP model on new data. `new_diag` is a numpy array containing the patient data for prediction, and `new_disease` is a numpy array containing the corresponding disease labels.
+    Evaluates the performance of the MLP model on new data. `new_diag` is a numpy array containing the patient data for prediction, and `new_disease` is a numpy array containing the corresponding disease labels. This will return AUC and AP scores as evaluation of performance and also includes a ROC and AP curve plot.
 
 #### Example
 
