@@ -48,10 +48,7 @@ class DataProcessor:
         refer = refer.drop(columns=["variable"])
         self.reference = refer
 
-    def diag_categorize(
-        self,
-        diag_data: pd.DataFrame[[[str]]],
-    ) -> pd.DataFrame[[[int]]]:
+    def diag_categorize(self, diag_data):
         """Catergorize diagnoses data."""
         # merge diagnoses data with ICD code reference
         diag = diag_data[diag_data["icd_version"] == "10"][
@@ -85,32 +82,34 @@ class DataProcessor:
 
         return cat_diag
 
-    def pca_extract(
+    def diag_pca(
         self,
-        data: pd.DataFrame[[[int]]],
         n_components: int,
-    ) -> pd.DataFrame[[[int]]]:
+        cat_diag,
+    ):
         """Perform PCA on data."""
         pca = PCAClassifier(n_components)
-        diag_features = pca.fit_transform(data.values)
-        pca_data = pd.DataFrame(
+        diag_features = pca.fit_transform(cat_diag.values)
+        pca_diag = pd.DataFrame(
             data=diag_features,
-            index=data.index,
+            index=cat_diag.index,
         )
 
-        return pca_data
+        return pca_diag
 
     def data_load(
         self,
+        disease_name: str,
         data_filename: str,
         n_components: int,
-    ) -> pd.DataFrame[[[int]]]:
+    ):
         """Read in csv file of diagnoses data and reformat to dataframe."""
         diag_data = pd.read_csv(data_filename).astype(str)
         cat_diag = self.diag_categorize(diag_data)
-        data_final = self.pca_extract(
-            data,
+        disease = cat_diag[disease_name]
+        pac_diag = self.diag_pca(
             n_components,
+            cat_diag.drop(disease_name, axis=1)
         )
 
-        return data_final
+        return pac_diag, disease
