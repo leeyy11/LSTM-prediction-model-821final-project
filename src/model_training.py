@@ -3,14 +3,8 @@ import numpy as np
 import torch
 from torch.utils.data import DataLoader
 import torch.nn as nn
-from sklearn.metrics import roc_auc_score
-import matplotlib.pyplot as plt
-import pandas as pd
-import numpy as np
-import torch
-from torch.utils.data import DataLoader
-import torch.nn as nn
 from sklearn.metrics import roc_auc_score,average_precision_score,roc_curve,precision_recall_curve
+import matplotlib.pyplot as plt
 from feature_extraction import get_feature
 import seaborn as sns
 
