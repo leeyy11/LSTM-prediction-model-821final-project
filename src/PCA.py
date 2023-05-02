@@ -1,8 +1,12 @@
+"""Define PCAClassifier."""
 from sklearn.decomposition import TruncatedSVD
 import pandas as pd
 
+
 class PCAClassifier:
-    def __init__(self, n_components=1):
+    """Define a PCAClassifier."""
+
+    def __init__(self, n_components=10):
         self.n_components = n_components
         self.pca = None
 
@@ -16,7 +20,3 @@ class PCAClassifier:
     def fit_transform(self, X, y=None):
         self.fit(X)
         return self.transform(X)
-
-
-if __name__ == '__main__':
-    main()
