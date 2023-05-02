@@ -1,13 +1,14 @@
+import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 import torch
 from torch.utils.data import DataLoader
 import torch.nn as nn
 from sklearn.metrics import roc_auc_score,average_precision_score,roc_curve,precision_recall_curve
-import matplotlib.pyplot as plt
 from feature_extraction import get_feature
 import seaborn as sns
 
+# data generation
 N_PATIENTS = 50000
 N_FEATURES = 100
 RANDOM_SEED = 2023
@@ -27,7 +28,7 @@ epochs = 50
 
 lam = 0e-5
 
-# def data loader
+
 def split_set(test_ratio, data):
     train = data[:int(test_ratio*len(data))]
     test = data[int(test_ratio*len(data)):]
@@ -58,10 +59,10 @@ def load_data(data_x, data_y):
     return train, test
 
 
-# def single label model
-class Model_s(nn.Module):
+# %% def single label model
+class DiseasePred(nn.Module):
     def __init__(self, hidden_size, num_layers):
-        super(Model_s, self).__init__()
+        super(DiseasePred, self).__init__()
         self.flatten = nn.Flatten()
         layers = []
 
@@ -80,17 +81,18 @@ class Model_s(nn.Module):
         logits = self.linear_sigmoid_stack(x)
         return logits
 
-# def model training
-def model_training_s(train, model, lam, learning_rate, epochs):
+    # %% def model training
+
+
+def model_train(train,model, lam, learning_rate, epochs):
     optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate)
 
-    # train_loss_list = []
-    # valid_loss_list = []
-
+    train_loss_list = []
+    test_loss_list = []
     for t in range(epochs):
         print(f"Epoch {t + 1}\n-------------------------------")
 
-        # train_loss = 0
+        train_loss = 0
         for X, y in train:
             predict = model(X)
             batch_loss = nn.functional.binary_cross_entropy(predict, y.unsqueeze(1).float())
@@ -105,32 +107,11 @@ def model_training_s(train, model, lam, learning_rate, epochs):
             batch_loss.backward()
             optimizer.step()
 
-            train_loss += batch_loss.item()
-            train_loss /= len(train)
-            train_loss_list.append(train_loss)
-    
-    test_loss = 0
-    with torch.no_grad():
-    for X, Y in test:
-        loss = nn.functional.binary_cross_entropy(model(X), Y[:, 0]unsqueeze(1))
-        test_loss += loss.item()
-        test_loss /= len(test)
-        test_loss_list.append(test_loss)
-    
-    x_axix = np.arange(epochs)
-    plt.figure()
-    plt.plot(x_axix, train_loss_list, color="red", label="train loss")
-    plt.plot(x_axix, test_loss_list, color="blue", label="test loss")
-    plt.xlabel("Epochs")
-    plt.legend()
-    plt.show()
-
-    return model
+    return model  # , train_loss_list, valid_loss_list
 
 
-# def performance plot
+# %% def performance plot
 def performance(labels, pred):
-    # AUROC + PR
     auc = roc_auc_score(labels, pred)
     ap = average_precision_score(labels, pred)
 
@@ -160,19 +141,20 @@ def performance(labels, pred):
 
     plt.show()
 
-    return auc, ap
 
+# # %% def single modeling
+def run():
+    X = get_feature()
+    binary_output = np.random.randint(2, size=(len(X), 1))
+    df_binary_output = pd.DataFrame(binary_output, columns=['Binary Output'], index=X.index)
+    X = pd.concat([pd.DataFrame(X), df_binary_output], axis=1)
+    xxx = np.array(X.iloc[:, :-1])
+    yyy = np.array(X.iloc[:, -1])
+    train,test = load_data(xxx, yyy)
 
+    model = DiseasePred(hidden_size, num_layers)
 
-# def single modeling
-def single_modeling(xx, yy):
-    train,test = load_data(xx, yy)
-    input_size=xx.shape[-1]
-
-
-    model = Model_s(hidden_size, num_layers)
-
-    model = model_training_s(train, model, lam, learning_rate, epochs)
+    model = model_train(train, model, lam, learning_rate, epochs)
 
     labels = []
     pred = []
@@ -187,3 +169,8 @@ def single_modeling(xx, yy):
     auc, ap = performance(labels1, pred1)
 
     return auc,ap
+
+# %% ---------------single/multi simulation--------------
+if __name__=='__main__':
+
+    auc, ap=run()
