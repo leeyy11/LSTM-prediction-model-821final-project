@@ -42,8 +42,11 @@ def test_data_load() -> None:
         ["subject_id", "icd_version", "icd_code"],
         ["123", "10", "A000"],
         ["456", "10", "A001"],
+        ["456", "10", "A400"],
     ]
     with fake_files(diagnoses_file) as data_file:
-        data = DataProcessor().data_load(1, data_file[0])
-        assert round(data.loc["123"][0], 2) == 1.41
-
+        pac_diag, disease = DataProcessor().data_load(
+            "Intestinal infection", data_file[0], 1
+        )
+        assert round(pac_diag.loc["123"][0], 2) == 0.85
+        assert disease.loc["123"] == 1
