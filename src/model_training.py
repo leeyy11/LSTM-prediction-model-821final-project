@@ -1,5 +1,3 @@
-# %% ---------------set hyper parameters and libraries--------------
-# library
 import pandas as pd
 import numpy as np
 import torch
@@ -16,7 +14,6 @@ from sklearn.metrics import roc_auc_score,average_precision_score,roc_curve,prec
 from feature_extraction import get_feature
 import seaborn as sns
 
-# data generation
 N_PATIENTS = 50000
 N_FEATURES = 100
 RANDOM_SEED = 2023
@@ -36,9 +33,7 @@ epochs = 50
 
 lam = 0e-5
 
-# %% ---------------single-label model--------------
-# %% def data loader
-
+# def data loader
 def split_set(test_ratio, data):
     train = data[:int(test_ratio*len(data))]
     test = data[int(test_ratio*len(data)):]
@@ -69,7 +64,7 @@ def load_data(data_x, data_y):
     return train, test
 
 
-# %% def single label model
+# def single label model
 class Model_s(nn.Module):
     def __init__(self, hidden_size, num_layers):
         super(Model_s, self).__init__()
@@ -91,9 +86,7 @@ class Model_s(nn.Module):
         logits = self.linear_sigmoid_stack(x)
         return logits
 
-    # %% def model training
-
-
+# def model training
 def model_training_s(train, model, lam, learning_rate, epochs):
     optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate)
 
@@ -118,44 +111,32 @@ def model_training_s(train, model, lam, learning_rate, epochs):
             batch_loss.backward()
             optimizer.step()
 
-        #     train_loss += batch_loss.item()
-        # train_loss /= len(train)
-        # train_loss_list.append(train_loss)
+            train_loss += batch_loss.item()
+            train_loss /= len(train)
+            train_loss_list.append(train_loss)
+    
+    test_loss = 0
+    with torch.no_grad():
+    for X, Y in test:
+        loss = nn.functional.binary_cross_entropy(model(X), Y[:, 0]unsqueeze(1))
+        test_loss += loss.item()
+        test_loss /= len(test)
+        test_loss_list.append(test_loss)
+    
+    x_axix = np.arange(epochs)
+    plt.figure()
+    plt.plot(x_axix, train_loss_list, color="red", label="train loss")
+    plt.plot(x_axix, test_loss_list, color="blue", label="test loss")
+    plt.xlabel("Epochs")
+    plt.legend()
+    plt.show()
 
-        # valid_loss = 0
-        # with torch.no_grad():
-        #     for X, y in valid:
-        #         X, y = X.to(device), y.to(device)
-        #         loss = nn.functional.binary_cross_entropy(model(X), y.unsqueeze(1))
-        #         valid_loss += loss.item()
-        # valid_loss /= len(valid)
-        # valid_loss_list.append(valid_loss)
-
-    return model  # , train_loss_list, valid_loss_list
+    return model
 
 
-# # %% def single modeling
-# def single_modeling(train, test):
-#     model = Model_s(hidden_size, num_layers)
-#
-#     model = model_training_s(train, test, model, lam, learning_rate, epochs)
-#
-#     labels = []
-#     pred = []
-#     with torch.no_grad():
-#         torch.manual_seed(2023)
-#         for X, Y in test:
-#             pred += model(X).tolist()
-#             labels += Y[:, 0].tolist()
-#     pred = sum(pred, [])
-#
-#     auc, ap = performance(np.array([labels[i] for i in range(len(labels))]), np.array([pred[i] for i in range(len(pred))]))
-#
-#     return auc, ap
-
-# %% def performance plot
+# def performance plot
 def performance(labels, pred):
-    # AUROC + PR +loss
+    # AUROC + PR
     auc = roc_auc_score(labels, pred)
     ap = average_precision_score(labels, pred)
 
@@ -185,11 +166,11 @@ def performance(labels, pred):
 
     plt.show()
 
-    # return auc, ap
+    return auc, ap
 
 
 
-# # %% def single modeling
+# def single modeling
 def single_modeling(xx, yy):
     train,test = load_data(xx, yy)
     input_size=xx.shape[-1]
@@ -215,66 +196,3 @@ def single_modeling(xx, yy):
     auc, ap = performance(labels1, pred1)
 
     return auc,ap
-
-
-# # %% def single modeling
-# def single_modeling(train, test):
-#     model = Model_s(hidden_size, num_layers)
-#
-#     model = model_training_s(train, test, model, lam, learning_rate, epochs)
-#
-#     labels = []
-#     pred = []
-#     with torch.no_grad():
-#         torch.manual_seed(2023)
-#         for X, Y in test:
-#             pred += model(X).tolist()
-#             labels += Y[:, 0].tolist()
-#     pred = sum(pred, [])
-#
-#     auc, ap = performance(np.array([labels[i] for i in range(len(labels))]), np.array([pred[i] for i in range(len(pred))]))
-#
-#     return auc,ap
-
-
-
-
-
-# %% ---------------single/multi simulation--------------
-X=get_feature()
-
-# Simulate binary output
-binary_output = np.random.randint(2, size=(len(X), 1))
-
-# Create a Pandas DataFrame from the binary output
-df_binary_output = pd.DataFrame(binary_output, columns=['Binary Output'],index=X.index)
-
-# Concatenate the feature data and the binary output horizontally
-# X['binary_output'] = pd.DataFrame(binary_output)
-
-X = pd.concat([pd.DataFrame(X), df_binary_output], axis=1)
-
-# auc_single = single_modeling(np.array(X.iloc[:,:-1]), np.array(X.iloc[:, -1]))
-xxx=np.array(X.iloc[:,:-1])
-yyy=np.array(X.iloc[:, -1])
-auc, ap=single_modeling(xxx, yyy)
-
-# single = pd.DataFrame(columns=["ER", "similarity", "AUC"])
-#
-# for event_rate in np.logspace(-3, -1, 3):
-#     for similarity in np.linspace(0.01, 1, 3):
-#         # x, e1, e2 = generate_data(event_rate, similarity)
-#
-#         np.array(X.iloc[:,:-1]), np.array(X.iloc[:, -1])
-#
-#         auc_single = single_modeling(np.array(X.iloc[:,:-1]), np.array(X.iloc[:, -1]))
-#
-#         single.loc[len(single)] = {"ER": event_rate,
-#                                    "similarity": similarity,
-#                                    "AUC": auc_single}
-#
-#
-#         print("ER:", event_rate, "similarity:", similarity)
-#
-# single.explode("AUC").to_csv("single.csv")
-# # %%
