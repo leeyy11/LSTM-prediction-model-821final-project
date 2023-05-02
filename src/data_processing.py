@@ -78,7 +78,6 @@ class DataProcessor:
             values="count",
             fill_value=0,
         )
-        # cat_diag = cat_diag.drop(cat_diag.columns[0], axis=1)
 
         return cat_diag
 
@@ -108,8 +107,7 @@ class DataProcessor:
         cat_diag = self.diag_categorize(diag_data)
         disease = cat_diag[disease_name]
         pac_diag = self.diag_pca(
-            n_components,
-            cat_diag.drop(disease_name, axis=1)
+            n_components, cat_diag.drop(disease_name, axis=1)
         )
 
         return pac_diag, disease
