@@ -40,10 +40,18 @@ This library requires the following Python packages:
 
 ## Installation
 
-To install this library, run the following command:
+To install this library, follow these steps:
+
+1. Clone the repository to your local machine
+
+1. Install the required dependencies by running the following command:
 
 ```
-pip install biomlp
+pip install numpy
+pip install pandas
+pip install sklearn
+pip install torch
+pip install matplotlib
 ```
 
 ## Group member
