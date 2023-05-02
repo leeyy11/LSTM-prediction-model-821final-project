@@ -17,7 +17,7 @@ def split_set(test_ratio=0.1, data: np.ndarray):
     return train, test
 
 # def data loader
-def load_data(data_x: np.ndarray, data_y: np.ndarray):
+def data_load(data_x: np.ndarray, data_y: np.ndarray):
     class TransData_s():
         def __init__(self, xx, yy):
             self.X = xx
