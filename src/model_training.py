@@ -11,13 +11,15 @@ import seaborn as sns
 from data_processing import DataProcessor
 
 
-def split_set(test_ratio=0.1, data: np.ndarray):
+def split_set(test_ratio=0.1, data: np.ndarray): -> np.ndarray
+    """Split train set and test set by test ratio."""
     train = data[:int(test_ratio*len(data))]
     test = data[int(test_ratio*len(data)):]
     return train, test
 
-# def data loader
+
 def data_load(data_x: np.ndarray, data_y: np.ndarray):
+    """Load and reformat data for torch."""
     class TransData_s():
         def __init__(self, xx, yy):
             self.X = xx
@@ -35,20 +37,18 @@ def data_load(data_x: np.ndarray, data_y: np.ndarray):
     train_set = TransData_s(xx=x_train, yy=y_train)
     test_set = TransData_s(xx=x_test, yy=y_test)
 
-    train = DataLoader(train_set, batch_size=7, shuffle=True)  # type: ignore
-    test = DataLoader(test_set, batch_size=7, shuffle=True)  # type: ignore
+    train = DataLoader(train_set, batch_size=7, shuffle=True)
+    test = DataLoader(test_set, batch_size=7, shuffle=True)
 
     return train, test
 
 
-# def single label model
 class DiseasePred(nn.Module):
+    """Define a MLP model."""
     def __init__(self, hidden_size=10, num_layers=1):
         super(DiseasePred, self).__init__()
         self.flatten = nn.Flatten()
         layers = []
-
-        # input_tensor = input_tensor.to(linear_layer.weight.dtype)
         layers.append(nn.Linear(input_size=10,hidden_size=10))
         layers.append(nn.ReLU())
         for i in range(num_layers - 1):
@@ -63,14 +63,12 @@ class DiseasePred(nn.Module):
         logits = self.linear_sigmoid_stack(x)
         return logits
 
-# def model training
 
 def model_train(train: np.ndarray, model: DiseasePred, lam=0e-5, learning_rate=0.001, epochs=50):
+    """Define model training."""
     optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate)
 
     for t in range(epochs):
-        print(f"Epoch {t + 1}\n-------------------------------")
-
         for X, y in train:
             predict = model(X)
             batch_loss = nn.functional.binary_cross_entropy(predict, y.unsqueeze(1).float())
@@ -88,11 +86,10 @@ def model_train(train: np.ndarray, model: DiseasePred, lam=0e-5, learning_rate=0
     return model
 
 
-# def performance plot
 def performance(labels: int, pred: int):
+    """Evaluating and plotting the model performance."""
     auc = roc_auc_score(labels, pred)
     ap = average_precision_score(labels, pred)
-
 
     plt.style.use('seaborn')
     sns.set_style("whitegrid")
@@ -121,10 +118,9 @@ def performance(labels: int, pred: int):
     return auc, ap
 
 
-# def single modeling
 def run(patient_filename: str, diagnoses_filename: str):
-    # X = get_feature()
-    X=DataProcessor().data_load(patient_filename, diagnoses_filename, n_components=10)
+    """Perform the MLP for disease prediction."""
+    X = DataProcessor().data_load(patient_filename, diagnoses_filename, n_components=10)
     binary_output = np.random.randint(2, size=(len(X), 1))
     df_binary_output = pd.DataFrame(binary_output, columns=['Binary Output'], index=X.index)
     X = pd.concat([pd.DataFrame(X), df_binary_output], axis=1)
