@@ -85,32 +85,32 @@ class DataProcessor:
 
         return cat_diag
 
-    def diag_pca(
+    def pca_extract(
         self,
+        data: pd.DataFrame[[[int]]],
         n_components: int,
-        cat_diag: pd.DataFrame[[[int]]],
     ) -> pd.DataFrame[[[int]]]:
         """Perform PCA on data."""
         pca = PCAClassifier(n_components)
-        diag_features = pca.fit_transform(cat_diag.values)
-        pca_diag = pd.DataFrame(
+        diag_features = pca.fit_transform(data.values)
+        pca_data = pd.DataFrame(
             data=diag_features,
-            index=cat_diag.index,
+            index=data.index,
         )
 
-        return pca_diag
+        return pca_data
 
     def data_load(
         self,
-        n_components: int,
         data_filename: str,
+        n_components: int,
     ) -> pd.DataFrame[[[int]]]:
         """Read in csv file of diagnoses data and reformat to dataframe."""
         diag_data = pd.read_csv(data_filename).astype(str)
         cat_diag = self.diag_categorize(diag_data)
-        data_final = self.diag_pca(
+        data_final = self.pca_extract(
+            data,
             n_components,
-            cat_diag,
         )
 
         return data_final
