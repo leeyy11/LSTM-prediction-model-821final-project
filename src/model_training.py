@@ -4,14 +4,22 @@ import numpy as np
 import torch
 from torch.utils.data import DataLoader
 import torch.nn as nn
-from sklearn.metrics import roc_auc_score,average_precision_score,roc_curve,precision_recall_curve
+from sklearn.metrics import (
+    roc_auc_score,
+    average_precision_score,
+    roc_curve,
+    precision_recall_curve,
+)
 import seaborn as sns
 from data_processing import DataProcessor
 
 
 class MLP(nn.Module):
     """Define a MLP model."""
-    def __init__(self, input_size, hidden_size=10, num_layers=1):
+
+    def __init__(
+        self, input_size: int, hidden_size: int = 10, num_layers: int = 1
+    ) -> torch.Tensor:
         super(MLP, self).__init__()
         self.flatten = nn.Flatten()
         layers = []
@@ -24,32 +32,45 @@ class MLP(nn.Module):
         layers.append(nn.Sigmoid())
         self.linear_sigmoid_stack = nn.Sequential(*layers)
 
-    def forward(self, x):
+    def forward(self, x: torch.Tensor):
         x = self.flatten(x).to(torch.float32)
         logits = self.linear_sigmoid_stack(x)
         return logits
 
 
-class DiseasePred():
+class DiseasePred:
     """Define a disease prediction library"""
 
-    def __init__(self, disease_name:str, diagnoses_filename: str, n_components=10):
+    def __init__(
+        self, disease_name: str, diagnoses_filename: str, n_components: int = 10
+    ) -> None:
         self.disease_name = disease_name
-        diag_df, disease_df = DataProcessor().data_load(disease_name, diagnoses_filename, n_components)
+        diag_df, disease_df = DataProcessor().data_load(
+            disease_name, diagnoses_filename, n_components
+        )
         self.xx = np.array(diag_df)
         self.yy = np.array(disease_df).transpose()
         self.n = n_components
         self.model = MLP(input_size=(self.n))
 
-    def split_set(self, data: np.ndarray, test_ratio):
+    def split_set(
+        self, data: np.ndarray, test_ratio: float
+    ) -> (np.ndarray, np.ndarray):
         """Split train set and test set by test ratio."""
-        train = data[:int(test_ratio*len(data))]
-        test = data[int(test_ratio*len(data)):]
+        train = data[: int(test_ratio * len(data))]
+        test = data[int(test_ratio * len(data)) :]
         return train, test
 
-    def torch_load(self, data_x: np.ndarray, data_y: np.ndarray, test_ratio, batch_size=7):
+    def torch_load(
+        self,
+        data_x: np.ndarray,
+        data_y: np.ndarray,
+        test_ratio: float,
+        batch_size: int = 7,
+    ) -> (torch.utils.data.DataLoader, torch.utils.data.DataLoader):
         """Load and reformat data for torch."""
-        class TransData_s():
+
+        class TransData_s:
             def __init__(self, xx, yy):
                 self.X = xx
                 self.y = yy
@@ -70,9 +91,10 @@ class DiseasePred():
         test = DataLoader(test_set, batch_size, shuffle=True)
 
         return train, test
-    
 
-    def learning(self, lam=0e-5, learning_rate=0.001, epochs=50):
+    def learning(
+        self, lam: float = 0e-5, learning_rate: float = 0.001, epochs: int = 50
+    ) -> None:
         """Define and train a MLP model."""
 
         train, test = self.torch_load(self.xx, self.yy, test_ratio=0.8)
@@ -81,7 +103,9 @@ class DiseasePred():
         for t in range(epochs):
             for X, y in train:
                 predict = self.model(X)
-                batch_loss = nn.functional.binary_cross_entropy(predict, y.unsqueeze(1).float())
+                batch_loss = nn.functional.binary_cross_entropy(
+                    predict, y.unsqueeze(1).float()
+                )
 
                 # L1 regularization
                 regularization_loss = 0
@@ -92,43 +116,44 @@ class DiseasePred():
                 optimizer.zero_grad()
                 batch_loss.backward()
                 optimizer.step()
-    
-    def pred(self, data_x: np.ndarray):
+
+    def pred(self, data_x: np.ndarray) -> np.ndarray:
         """Return the predcted probability of disease."""
         x_tensor = torch.from_numpy(data_x)
         pred = self.model(x_tensor).detach().numpy()
-        return(pred)
-    
-    def performance(self, new_diag: np.ndarray, new_disease: np.ndarray):
+        return pred
+
+    def performance(
+        self, new_diag: np.ndarray, new_dissease: np.ndarray
+    ) -> (float, float):
         """Evaluating and plotting the model performance on new data."""
-        labels = new_disease
+        labels = new_dissease
         pred = self.pred(new_diag)
         auc = roc_auc_score(labels, pred)
         ap = average_precision_score(labels, pred)
 
-        plt.style.use('seaborn')
+        plt.style.use("seaborn")
         sns.set_style("whitegrid")
         fig, ax = plt.subplots(nrows=1, ncols=2, figsize=(10, 5))
 
         fpr, tpr, _ = roc_curve(labels, pred)
         precision, recall, _ = precision_recall_curve(labels, pred)
 
-        ax[0].plot(fpr, tpr, label='AUC = %.3f' % auc)
-        ax[0].set_xlim([-.01, 1.01]) # type: ignore
-        ax[0].set_ylim([-.01, 1.01]) # type: ignore
-        ax[0].set_xlabel('False Positive Rate (1 - Specificity)', fontsize=14)
-        ax[0].set_ylabel('True Positive Rate (Sensitivity)', fontsize=14)
-        ax[0].plot([0, 1], [0, 1], 'k--', label='No information')
-        ax[0].legend(loc='lower right', fontsize=14)
+        ax[0].plot(fpr, tpr, label="AUC = %.3f" % auc)
+        ax[0].set_xlim([-0.01, 1.01])  # type: ignore
+        ax[0].set_ylim([-0.01, 1.01])  # type: ignore
+        ax[0].set_xlabel("False Positive Rate (1 - Specificity)", fontsize=14)
+        ax[0].set_ylabel("True Positive Rate (Sensitivity)", fontsize=14)
+        ax[0].plot([0, 1], [0, 1], "k--", label="No information")
+        ax[0].legend(loc="lower right", fontsize=14)
 
-        ax[1].plot(recall, precision, label='Avg Precision = %.3f' % ap)
-        ax[1].set_xlim([-.01, 1.01]) # type: ignore
-        ax[1].set_ylim([-.01, 1.01]) # type: ignore
-        ax[1].set_xlabel('Recall (Sensitivity)', fontsize=14)
-        ax[1].set_ylabel('Precision (Positive Predictive Value)', fontsize=14)
-        ax[1].plot([0, 1], [labels.mean(), labels.mean()], 'k--', label='No information')   # type: ignore
-        ax[1].legend(loc='upper right', fontsize=14)
+        ax[1].plot(recall, precision, label="Avg Precision = %.3f" % ap)
+        ax[1].set_xlim([-0.01, 1.01])  # type: ignore
+        ax[1].set_ylim([-0.01, 1.01])  # type: ignore
+        ax[1].set_xlabel("Recall (Sensitivity)", fontsize=14)
+        ax[1].set_ylabel("Precision (Positive Predictive Value)", fontsize=14)
+        ax[1].plot([0, 1], [labels.mean(), labels.mean()], "k--", label="No information")  # type: ignore
+        ax[1].legend(loc="upper right", fontsize=14)
 
         plt.show()
         return auc, ap
-    
