@@ -11,7 +11,7 @@ import seaborn as sns
 from data_processing import DataProcessor
 
 
-def split_set(test_ratio=0.1, data: np.ndarray): -> np.ndarray
+def split_set(test_ratio=0.1, data: np.ndarray):
     """Split train set and test set by test ratio."""
     train = data[:int(test_ratio*len(data))]
     test = data[int(test_ratio*len(data)):]
