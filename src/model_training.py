@@ -124,7 +124,7 @@ def performance(labels: int, pred: int):
 # def single modeling
 def run(patient_filename: str, diagnoses_filename: str):
     # X = get_feature()
-    X=DataProcessor().data_load(patient_filename, diagnoses_filename)
+    X=DataProcessor().data_load(patient_filename, diagnoses_filename, n_components=10)
     binary_output = np.random.randint(2, size=(len(X), 1))
     df_binary_output = pd.DataFrame(binary_output, columns=['Binary Output'], index=X.index)
     X = pd.concat([pd.DataFrame(X), df_binary_output], axis=1)
