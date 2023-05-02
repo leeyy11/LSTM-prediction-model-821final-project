@@ -65,5 +65,31 @@ pip install seaborn
 
 ### DataProcessor Class
 
-This is a class
+The `DataProcessor` class provides methods to categorize, expand, load and parse diagnoses data. 
 
+To use this class, create an instance of the class with the `diag_filename` parameter (default value is "DXCCSR.csv"). Then, you can call the following methods:
+
+#### expand_diag(diag: pd.DataFrame) -> pd.DataFrame
+
+Categorize and expand the diagnoses data. This method takes a Pandas DataFrame as input and returns a Pandas DataFrame as output.
+
+#### data_load(patient_filename: str, diagnoses_filename: str) -> pd.DataFrame
+
+Load and parsing clinical data. This method takes two parameters, `patient_filename` and `diagnoses_filename`, which are the names of the patient and diagnoses files to be loaded, respectively. It returns a Pandas DataFrame as output.
+
+#### Example
+
+```python
+from data_processor import DataProcessor
+import pandas as pd
+
+processor = DataProcessor()
+patient_file = "patient_data.csv"
+diagnoses_file = "diagnoses_data.csv"
+
+data = processor.data_load(patient_file, diagnoses_file)
+```
+
+In the example above, an instance of the `DataProcessor` class is created, and the `data_load` method is used to load and parse clinical data from two input files: `patient_data.csv` and `diagnoses_data.csv`. The resulting output is stored in the `data` variable.
+
+### DiseasePred Class
